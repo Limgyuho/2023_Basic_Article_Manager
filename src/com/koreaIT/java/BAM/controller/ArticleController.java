@@ -16,8 +16,8 @@ public class ArticleController extends Controller{
 	//전역변수로 만들어준다
 	private String cmd;
 	
-	public ArticleController(List<Article> articles, Scanner sc) {
-		this.articles = articles;
+	public ArticleController(Scanner sc) {
+		this.articles = new ArrayList<>();
 		this.sc = sc;
 		this.lastArticleId =3;
 	}
@@ -233,4 +233,14 @@ public class ArticleController extends Controller{
 	}
 
 
+
+	public void makeTestData() {
+		System.out.println("게시물 데트스 데이터를 생성합니다");
+		articles.add(new Article(1, Util.getDate(), "제목1", "테스트", 10));
+		articles.add(new Article(2, Util.getDate(), "제목2", "테스트", 20));
+		articles.add(new Article(3, Util.getDate(), "제목3", "테스트", 30));
+	}
 }
+
+
+

@@ -13,25 +13,17 @@ import com.koreaIT.java.BAM.util.Util;
 
 public class App {
 
-	// 스태틱 변수는 스태틱만 참조 가능하다
-	private List<Article> articles;
-	private List<Member> members;
-
-	App() {
-		articles = new ArrayList<>();
-		members = new ArrayList<>();
-	}
 
 	public void run() {
 		System.out.println("== 프로그램 시작 ==");
 
-		makeTestData();
 
 		Scanner sc = new Scanner(System.in);
 
-		MemberController memberController = new MemberController(members, sc);
-		ArticleController articleController = new ArticleController(articles, sc);
+		MemberController memberController = new MemberController(sc);
+		ArticleController articleController = new ArticleController(sc);
 
+		articleController.makeTestData();
 
 		while (true) {
 
@@ -85,10 +77,4 @@ public class App {
 
 	}
 
-	private void makeTestData() {
-		System.out.println("게시물 데트스 데이터를 생성합니다");
-		articles.add(new Article(1, Util.getDate(), "제목1", "테스트", 10));
-		articles.add(new Article(2, Util.getDate(), "제목2", "테스트", 20));
-		articles.add(new Article(3, Util.getDate(), "제목3", "테스트", 30));
-	}
 }
