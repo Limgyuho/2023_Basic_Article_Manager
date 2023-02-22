@@ -1,11 +1,11 @@
 package com.koreaIT.java.BAM;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
 import com.koreaIT.java.BAM.controller.ArticleController;
+import com.koreaIT.java.BAM.controller.Controller;
 import com.koreaIT.java.BAM.controller.MemberController;
 import com.koreaIT.java.BAM.dto.Article;
 import com.koreaIT.java.BAM.dto.Member;
@@ -32,7 +32,6 @@ public class App {
 		MemberController memberController = new MemberController(members, sc);
 		ArticleController articleController = new ArticleController(articles, sc);
 
-		int lastArticleId = 3;
 
 		while (true) {
 
@@ -46,23 +45,37 @@ public class App {
 
 			if (cmd.equals("exit")) {
 				break;
-			} else if (cmd.equals("member join")) {
-				memberController.doJoin();
-			} else if (cmd.equals("article write")) {
-				articleController.dowrite();
-			} else if (cmd.startsWith("article list")) {
-				articleController.showList(cmd);
-			} else if (cmd.startsWith("article detail ")) {
-				articleController.showdetail(cmd);
-			} else if (cmd.startsWith("article delete ")) {
-				articleController.doDelete(cmd);
-			} else if (cmd.startsWith("article modify ")) {
-				articleController.doModify(cmd);
+			}
+			// cmd를 한번에 묶어서 찾아내기 위해서 가져 온다
+			// 명령어가 어떤 걸로 들어 왔는지 확인 한다 조건문으로
+			String[] cmdBits = cmd.split(" ");
+
+			
+			if(cmdBits.length ==1) {
+				System.out.println("명령어를 확인해주세요");
+				continue;
+			}
+			
+			String controllerName = cmdBits[0];
+			String methodName = cmdBits[1];
+			
+			Controller controller = null;
+
+			// member와 같을때
+			if (controllerName.equals("member")) {
+				// memberController에게 권한 넘기기기
+				controller = memberController;
+			}
+			// article와 같을때
+			else if (controllerName.equals("article")) {
+				// articleController에게 권한 넘기기기
+				controller =  articleController;
+			} else {
+				System.out.println("존재하지 않는 명령어 입니다");
+				continue;
 			}
 
-			else {
-				System.out.println("존재하지 않는 명령어 입니다");
-			}
+			controller.doAction(cmd, methodName);
 
 		}
 
@@ -71,19 +84,6 @@ public class App {
 		sc.close();
 
 	}
-
-//		private int articleIndexbyId(int id) {
-//			int i = 0;
-//			
-//			for (Article article : articles) {
-//
-//				if (article.id == id) {
-//					return i;
-//				}
-//				i++;
-//			} 
-//			return -1;
-//		}
 
 	private void makeTestData() {
 		System.out.println("게시물 데트스 데이터를 생성합니다");

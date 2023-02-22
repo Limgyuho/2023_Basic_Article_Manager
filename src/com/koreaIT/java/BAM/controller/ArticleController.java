@@ -6,14 +6,15 @@ import java.util.List;
 import java.util.Scanner;
 
 import com.koreaIT.java.BAM.dto.Article;
-import com.koreaIT.java.BAM.dto.Member;
 import com.koreaIT.java.BAM.util.Util;
 
-public class ArticleController {
+public class ArticleController extends Controller{
 
-	List<Article> articles;
-	Scanner sc;
-	int lastArticleId;
+	private List<Article> articles;
+	private Scanner sc;
+	private int lastArticleId;
+	//전역변수로 만들어준다
+	private String cmd;
 	
 	public ArticleController(List<Article> articles, Scanner sc) {
 		this.articles = articles;
@@ -21,7 +22,35 @@ public class ArticleController {
 		this.lastArticleId =3;
 	}
 
-	public void dowrite() {
+	public void doAction(String cmd,String methodName) {
+
+		//전역변수로 만들어준다
+		this.cmd = cmd;
+				
+		switch(methodName) {
+		case "write":
+			dowrite();
+			break;
+		case "list":
+			showList();
+			break;
+		case "detail":
+			showdetail();
+			break;
+		case "modify":
+			doModify();
+			break;
+		case "delete":
+			doDelete();
+			break;
+			
+		default:
+			System.out.println("존재하지 않는 명령어 입니다");
+			break;
+		}	
+				
+	}
+	private void dowrite() {
 
 		int id = lastArticleId + 1;
 		lastArticleId = id;
@@ -40,7 +69,7 @@ public class ArticleController {
 
 	}
 
-	public void showList(String cmd) {
+	private void showList() {
 		if (articles.size() == 0) {
 
 			System.out.println("게시글이 없습니다");
@@ -91,9 +120,15 @@ public class ArticleController {
 		}		
 	}
 
-	public void showdetail(String cmd) {
+	private void showdetail() {
 		// 특정 문자 찾기
 		String[] cmdBits = cmd.split(" ");
+		
+		if (cmdBits.length ==2) {
+			System.out.println("명령어를 확인해주세요");
+			return;
+		}
+		
 		int id = Integer.parseInt(cmdBits[2]);
 
 		// 중복 기능 제거
@@ -134,10 +169,17 @@ public class ArticleController {
 		return null;
 	}
 
-	public void doModify(String cmd) {
+	private void doModify() {
 		// 특정 문자 찾기
 		String[] cmdBits = cmd.split(" ");
 		// integer는 형변환의 일종이다.
+		
+		
+		
+		if (cmdBits.length ==2) {
+			System.out.println("명령어를 확인해주세요");
+			return;
+		}
 		int id = Integer.parseInt(cmdBits[2]);
 
 		// modify는 순회를 인덱스로 하기 때문에 인덱스로 만든다
@@ -161,10 +203,17 @@ public class ArticleController {
 		System.out.printf("%d번 게시글을 수정하였습니다\n", id);		
 	}
 
-	public void doDelete(String cmd) {
+	private void doDelete() {
 		// 특정 문자 찾기
 		String[] cmdBits = cmd.split(" ");
 		// integer는 형변환의 일종이다.
+		
+		if (cmdBits.length ==2) {
+			System.out.println("명령어를 확인해주세요");
+			return;
+		}
+		
+		
 		int id = Integer.parseInt(cmdBits[2]);
 
 		// 명령어 맨뒤에 오는 것을 기준으로 한다
@@ -182,5 +231,6 @@ public class ArticleController {
 		articles.remove(articles.indexOf(foundArticle));
 		System.out.printf("%d 게시글이 삭제 되었습니다\n", id);		
 	}
+
 
 }
