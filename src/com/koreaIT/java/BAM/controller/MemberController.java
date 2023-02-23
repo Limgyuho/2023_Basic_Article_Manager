@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import com.koreaIT.java.BAM.dto.Article;
 import com.koreaIT.java.BAM.dto.Member;
 import com.koreaIT.java.BAM.util.Util;
 
@@ -13,11 +12,13 @@ public class MemberController extends Controller {
 	private List<Member> members;
 	private Scanner sc;
 	private int lastMemberId;
+	private Member loginedMember;
 
 	public MemberController(Scanner sc) {
 		this.members = new ArrayList<>();
 		this.sc = sc;
-		this.lastMemberId = 0;
+		this.lastMemberId = 3;
+		this.loginedMember= null;
 	}
 
 	public void doAction(String cmd, String methodName) {
@@ -96,11 +97,27 @@ public class MemberController extends Controller {
 	}
 	
 	private void doLogin() {
+		
+		
+		
+		
+		
+		if(loginedMember == null) {
+			System.out.println("로그인 상태가 아닙니다 로그인을 해주세요");
+			return;
+		}
+		else if(loginedMember != null) {
+			System.out.println("로그인상태 입니다");
+			return;
+		}
+		
 		System.out.printf("로그인 아이디 : ");
 		String loginId = sc.nextLine();
 		System.out.printf("로그인 비밀번호 : ");
 		String loginPw = sc.nextLine();
 
+		
+	
 		
 		//로그인후 로그아웃 되지 않게 저장할수 있게 하는 공간을 만들어 인자로 저장한
 		Member member =getMemberByLoginId(loginId);
@@ -110,10 +127,16 @@ public class MemberController extends Controller {
 			System.out.println("존재하지 않는 아이디 입니다");
 			return;
 		}
+		
 		if(member.loginPw.equals(loginPw) == false) {
 			System.out.println("비밀번호가 일치 하지 않습니다");
 			return;
 		}
+		
+		//로그인시 정보를 저장
+		this.loginedMember = member;
+		
+		
 		
 		System.out.printf("로그인 성공! %s님 환영합니다\n",member.name);
 		
@@ -146,11 +169,20 @@ public class MemberController extends Controller {
 //		}
 		
 		//있는지 없지 판단
-		if(member != null) {
-			return false;
+		if(member == null) {
+			return true;
 		}
 
-		return true;
+		return false;
 	}
+	
+	//int id,String regDate, String loginId, String loginPw,String loginPwChk,String name
+	public void makeTestData() {
+		System.out.println("회원 데이터를 생성합니다");
+		members.add(new Member(1, Util.getDate(), "아이디1", "비밀번호1", "비밀번호확인1","이름1"));
+		members.add(new Member(2, Util.getDate(), "아이디2", "비밀번호2", "비밀번호확인2","이름2"));
+		members.add(new Member(3, Util.getDate(), "아이디3", "비밀번호3", "비밀번호확인3","이름3"));
+	}
+	
 
 }
