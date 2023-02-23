@@ -30,6 +30,12 @@ public class MemberController extends Controller {
 		case "login":
 			doLogin();
 			break;
+		case "logout":
+			doLogout();
+			break;
+		case "profile":
+			doprofile();
+			break;
 		default:
 			System.out.println("존재하지 않는 명령어 입니다");
 			break;
@@ -51,6 +57,11 @@ public class MemberController extends Controller {
 //	}
 
 	private void doJoin() {
+		
+		if(isLogined()) {
+			System.out.println("로그아웃 후 이용해주세요");
+			return;
+		}
 
 		int id = lastMemberId + 1;
 		lastMemberId = id;
@@ -97,16 +108,18 @@ public class MemberController extends Controller {
 	}
 	
 	private void doLogin() {
+			
+//		if(loginedMember == null) {
+//			System.out.println("로그인 상태가 아닙니다 로그인을 해주세요");
+//			return;
+//		}
+//		else if(loginedMember != null) {
+//			System.out.println("로그인상태 입니다");
+//			return;
+//		}
 		
 		
-		
-		
-		
-		if(loginedMember == null) {
-			System.out.println("로그인 상태가 아닙니다 로그인을 해주세요");
-			return;
-		}
-		else if(loginedMember != null) {
+		if(isLogined()) {
 			System.out.println("로그인상태 입니다");
 			return;
 		}
@@ -117,7 +130,6 @@ public class MemberController extends Controller {
 		String loginPw = sc.nextLine();
 
 		
-	
 		
 		//로그인후 로그아웃 되지 않게 저장할수 있게 하는 공간을 만들어 인자로 저장한
 		Member member =getMemberByLoginId(loginId);
@@ -141,6 +153,36 @@ public class MemberController extends Controller {
 		System.out.printf("로그인 성공! %s님 환영합니다\n",member.name);
 		
 	}
+	
+	private void doprofile() {
+		if(isLogined()== true) {
+			System.out.println("==내정보==");
+			System.out.printf("로그인 아이디: %s\n",loginedMember.loginId);
+			System.out.printf("이름 : %s\n",loginedMember.name);
+			System.out.printf("회원 비밀번호 : %d\n",loginedMember.loginPw);
+			System.out.printf("회원 번호 : %d\n",loginedMember.id);
+			System.out.printf("가입날짤 : %s\n",loginedMember.regDate);
+			return;
+		}
+		this.loginedMember = null;
+		System.out.println("로그인후 이용해주세요");
+	}
+
+	
+
+	private boolean isLogined() {
+		return loginedMember != null;
+	}
+
+	private void doLogout() {
+		if(isLogined()== false) {
+			System.out.println("로그인 후 이용해주세요");
+			return;
+		}
+		this.loginedMember = null;
+		System.out.println("로그아웃 성공");
+	}
+	
 	private Member getMemberByLoginId(String loginId) {
 		
 		for (Member member : members) {
