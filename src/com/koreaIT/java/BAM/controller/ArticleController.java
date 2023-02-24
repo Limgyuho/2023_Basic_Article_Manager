@@ -30,6 +30,7 @@ public class ArticleController extends Controller{
 				
 		switch(methodName) {
 		case "write":
+			//로그인을 하고 나서 명령어를 수행 할수 있게 해준다
 			if (isLogined() ==false) {
 				System.out.println("로그인 후 이용해주세요");
 				return;
@@ -43,9 +44,19 @@ public class ArticleController extends Controller{
 			showdetail();
 			break;
 		case "modify":
+			//로그인을 하고 나서 명령어를 수행 할수 있게 해준다
+			if (isLogined() == false) {
+				System.out.println("로그인 후 이용해주세요");
+				return;
+			}
 			doModify();
 			break;
 		case "delete":
+			//로그인을 하고 나서 명령어를 수행 할수 있게 해준다
+			if (isLogined() == false) {
+				System.out.println("로그인 후 이용해주세요");
+				return;
+			}
 			doDelete();
 			break;
 			
@@ -183,8 +194,6 @@ public class ArticleController extends Controller{
 		String[] cmdBits = cmd.split(" ");
 		// integer는 형변환의 일종이다.
 		
-		
-		
 		if (cmdBits.length ==2) {
 			System.out.println("명령어를 확인해주세요");
 			return;
@@ -193,16 +202,26 @@ public class ArticleController extends Controller{
 
 		// modify는 순회를 인덱스로 하기 때문에 인덱스로 만든다
 
+		//foundArticle안에 게시물의 정보가 담겨져있다
 		Article foundArticle = articlebyId(id);
 
+		
+		
 		// 게시물이 없는 경우-
 		if (foundArticle == null) {
 			System.out.println("게시글이 없습니다");
 			return;
 		}
-		System.out.printf("제목 : ");
+		
+		//loginedMember.id 현재 로그인된 아이디 와 게시글에서의 멤버 아이디와 비교 한다
+		if(loginedMember.id != foundArticle.memberid) {
+			System.out.println("수정 권한이 없습니다");
+			return;
+		}
+		
+		System.out.printf("수정할 제목 : ");
 		String title = sc.nextLine();
-		System.out.printf("내용 : ");
+		System.out.printf("수정할 내용 : ");
 		String body = sc.nextLine();
 
 		// 변경된 값을 리모컨의 내부에 넣어준다
@@ -215,6 +234,7 @@ public class ArticleController extends Controller{
 	private void doDelete() {
 		// 특정 문자 찾기
 		String[] cmdBits = cmd.split(" ");
+		
 		// integer는 형변환의 일종이다.
 		
 		if (cmdBits.length ==2) {
@@ -232,6 +252,13 @@ public class ArticleController extends Controller{
 		// 게시물이 없는 경우-
 		if (foundArticle == null) {
 			System.out.println("게시글이 없습니다");
+			return;
+		}
+		
+		
+		//loginedMember.id 현재 로그인된 아이디 와 게시글에서의 멤버 아이디와 비교 한다
+		if(loginedMember.id != foundArticle.memberid) {
+			System.out.println("수정 권한이 없습니다");
 			return;
 		}
 
