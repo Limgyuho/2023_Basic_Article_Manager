@@ -8,18 +8,19 @@ public class Article extends Dto{
 	public String body;
 	public String regDate;
 	public int hit;
+	public int memberid;
 	
-
-	public Article(int id,String regDate, String title, String body) {
+	public Article(int id,  String regDate,int memberid, String title, String body) {
 		//함수 호출 생성자 에서만 가능 하며 생성자의 첫번째 줄만 가능하다
-		this(id,regDate,title,body,0);
+		this(id,regDate,memberid,title,body,0);
 	}
-	public Article(int id,String regDate, String title, String body, int hit) {
+	public Article(int id,String regDate, int memberid,String title, String body, int hit) {
 		this.id = id;
 		this.title = title;
 		this.body = body;
 		this.regDate = regDate;
 		this.hit = hit;
+		this.memberid = memberid;
 	}
 	public void increase() {
 		this.hit++;
