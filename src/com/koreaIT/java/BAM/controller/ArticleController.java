@@ -30,11 +30,7 @@ public class ArticleController extends Controller{
 				
 		switch(methodName) {
 		case "write":
-			//로그인을 하고 나서 명령어를 수행 할수 있게 해준다
-			if (isLogined() ==false) {
-				System.out.println("로그인 후 이용해주세요");
-				return;
-			}
+			
 			dowrite();
 			break;
 		case "list":
@@ -45,18 +41,12 @@ public class ArticleController extends Controller{
 			break;
 		case "modify":
 			//로그인을 하고 나서 명령어를 수행 할수 있게 해준다
-			if (isLogined() == false) {
-				System.out.println("로그인 후 이용해주세요");
-				return;
-			}
+		
 			doModify();
 			break;
 		case "delete":
 			//로그인을 하고 나서 명령어를 수행 할수 있게 해준다
-			if (isLogined() == false) {
-				System.out.println("로그인 후 이용해주세요");
-				return;
-			}
+	
 			doDelete();
 			break;
 			

@@ -150,6 +150,7 @@ public class MemberController extends Controller {
 	}
 
 	private void doprofile() {
+		
 		if (isLogined() == true) {
 			System.out.println("==내정보==");
 			System.out.printf("로그인 아이디: %s\n", loginedMember.loginId);
