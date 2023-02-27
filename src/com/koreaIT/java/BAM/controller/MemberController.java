@@ -4,18 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import com.koreaIT.java.BAM.container.Container;
 import com.koreaIT.java.BAM.dto.Member;
 import com.koreaIT.java.BAM.util.Util;
 
 public class MemberController extends Controller {
 
-	private List<Member> members;
+	private List<Member> members; //
 	private Scanner sc;
 	private int lastMemberId;
 	public int memberid;
 
 	public MemberController(Scanner sc) {
-		this.members = new ArrayList<>();
+		this.members = Container.memberDao.members;
 		this.sc = sc;
 		this.lastMemberId = 3;
 		
