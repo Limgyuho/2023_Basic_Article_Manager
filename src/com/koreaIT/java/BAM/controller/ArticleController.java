@@ -6,23 +6,24 @@ import java.util.List;
 import java.util.Scanner;
 
 import com.koreaIT.java.BAM.container.Container;
+import com.koreaIT.java.BAM.dao.ArticleDao;
 import com.koreaIT.java.BAM.dto.Article;
 import com.koreaIT.java.BAM.dto.Member;
 import com.koreaIT.java.BAM.util.Util;
 
 public class ArticleController extends Controller{
 
-	private List<Article> articles;
+//	private List<Article> articles;
 	private Scanner sc;
-	private int lastArticleId;
 	//전역변수로 만들어준다
 	private String cmd;
 	public int memberid;
 	
 	public ArticleController(Scanner sc) {
-		this.articles = Container.articleDao.articles;
 		this.sc = sc;
-		this.lastArticleId =3;
+//		this.articles = Container.articleDao.articles;
+		//하드코딩을
+		
 	}
 
 	public void doAction(String cmd,String methodName) {
@@ -61,8 +62,8 @@ public class ArticleController extends Controller{
 	private void dowrite() {
 
 		
-		int id = lastArticleId + 1;
-		lastArticleId = id;
+		int id = Container.articleDao.lastArticleId();
+		
 
 		String regDate = Util.getDate();
 
@@ -73,49 +74,34 @@ public class ArticleController extends Controller{
 
 		//
 		Article article = new Article(id, regDate,loginedMember.id, title, body);
-		articles.add(article);
+		
+		//articles.add(article);
+		Container.articleDao.add(article);
+		
 
 		System.out.printf("%d번 글이 생성되었습니다\n", id);
 
 	}
 
 	private void showList() {
-		if (articles.size() == 0) {
-
-			System.out.println("게시글이 없습니다");
-			return;
-		}
+	
 
 		// article list 검색어 를 하였을때 인덱스부터 인식한다
 		// 검색어를 뽑아 온것에서 총 길이 에서 trim을 해주어야 한다
 		String searchKeyworld = cmd.substring("article list".length()).trim();
 
+	
+		
 		//printArticles 라는 리모컨을 만들어 준다
 		
-		List<Article> printArticles = new ArrayList<>(articles);
+		List<Article> printArticles = Container.articleService.getprintArticles(searchKeyworld);
 		
-		
+		if (printArticles.size() == 0) {
 
-		if (searchKeyworld.length() > 0) {
-			System.out.println("검색어 : " + searchKeyworld);
-			//검색어가 있으면 비어있는 객체에 추가한다
-			printArticles = new ArrayList<>();
-			printArticles.clear();
-			
-			for (Article article : articles) {
-				if (article.title.contains(searchKeyworld)) {
-					//제목의 게시물이 추가 된 상태 이다
-					printArticles.add(article);
-				}
-			}
-			//검색 결과가 없을 경우 다시 명령을 입력하게 끔 continue를 사용한다
-			if(printArticles.size()==0) {
-				System.out.println("검색 결과가 존재 하지 않습니다");
-				//무한 반복문 안에 있으므로 continue 가 사용 가능하다
-				return;
-			}
-
+			System.out.println("게시글이 없습니다");
+			return;
 		}
+		
 
 		//printArticles을 순회해준다
 		System.out.printf("번호	|	제목	|	날짜	|	작성자	|	조회\n");
@@ -161,8 +147,18 @@ public class ArticleController extends Controller{
 			// 게시물이 없는 경우
 			System.out.println("게시글이 없습니다");
 			return;
-		} else {
+		} 
 
+		String writeName = null;
+		
+		List<Member> members = Container.memberDao.members;
+		
+		for(Member member : members) {
+			if (foundArticle.memberid == member.id) {
+				writeName = member.name;
+				break;
+			}
+		}
 			// 조회수 기능은 함수를 이용 하는것을 추천한다
 			// 게시글들 마다 구별짓기 위함이다
 			// article write을 하였을때 article 객체로 조립되는 순간 개시글이 조회 되는 순간 0이 된다
@@ -173,12 +169,12 @@ public class ArticleController extends Controller{
 			System.out.printf("날짜 : %s\n", foundArticle.regDate);
 			System.out.printf("제목 : %s\n", foundArticle.title);
 			System.out.printf("내용 : %s\n", foundArticle.body);
-			System.out.printf("작성자 : %d\n", foundArticle.memberid);
+			System.out.printf("작성자 : %d\n", writeName);
 			// 조회수 기능을 보여주는 기능을 먼저 보여준다
 			System.out.printf("조회수 : %d\n", foundArticle.hit);
 
 		}		
-	}
+	
 	private Article articlebyId(int id) {
 		// 중복 기능 제거
 		// 찾은 문자를 순회 하는 방법
@@ -275,9 +271,9 @@ public class ArticleController extends Controller{
 
 	public void makeTestData() {
 		System.out.println("게시물 데트스 데이터를 생성합니다");
-		articles.add(new Article(1, Util.getDate(), 1,"제목1", "테스트", 10));
-		articles.add(new Article(2, Util.getDate(), 2,"제목2", "테스트", 20));
-		articles.add(new Article(3, Util.getDate(), 3,"제목3", "테스트", 30));
+		Container.articleDao.add(new Article(Container.articleDao.lastId, Util.getDate(), 1,"제목1", "테스트", 10));
+		Container.articleDao.add(new Article(Container.articleDao.lastId, Util.getDate(), 2,"제목2", "테스트", 20));
+		Container.articleDao.add(new Article(Container.articleDao.lastId, Util.getDate(), 3,"제목3", "테스트", 30));
 	}
 }
 
