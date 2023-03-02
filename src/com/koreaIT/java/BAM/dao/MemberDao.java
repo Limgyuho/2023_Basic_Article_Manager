@@ -9,7 +9,6 @@ import com.koreaIT.java.BAM.dto.Member;
 public class MemberDao extends Dao {
 
 	public List<Member> members;
-	public int lastId;
 
 	public MemberDao() {
 		this.members = new ArrayList<>();

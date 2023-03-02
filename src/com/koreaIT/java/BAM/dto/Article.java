@@ -3,11 +3,9 @@ package com.koreaIT.java.BAM.dto;
 
 public class Article extends Dto{
 	//public을 통하여 다른 패키지와 연동이 가능하다
-	public	int id;
 	public String title;
 	public String body;
-	public String regDate;
-	
+	public String regDate;	
 	public int hit;
 	public int memberid;
 	

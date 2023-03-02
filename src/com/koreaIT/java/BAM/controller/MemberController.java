@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import com.koreaIT.java.BAM.container.Container;
+import com.koreaIT.java.BAM.dto.Article;
 import com.koreaIT.java.BAM.dto.Member;
 import com.koreaIT.java.BAM.util.Util;
 
@@ -112,7 +113,6 @@ public class MemberController extends Controller {
 //			}
 		Member member = null;
 		String loginPw = null;
-		
 
 		while (true) {
 
@@ -137,9 +137,6 @@ public class MemberController extends Controller {
 			// 로그인후 로그아웃 되지 않게 저장할수 있게 하는 공간을 만들어 인자로 저장한
 			member = getMemberByLoginId(loginId);
 
-			
-			
-			
 			// 아이디가 없는 경우 일치하는것이 없는 경우
 			if (member == null) {
 				System.out.println("존재하지 않는 아이디 입니다");
@@ -224,12 +221,11 @@ public class MemberController extends Controller {
 	// loginPwChk,String name
 	public void makeTestData() {
 		System.out.println("회원 데이터를 생성합니다");
-		Container.memberDao
-				.add(new Member(Container.memberDao.lastId, Util.getDate(), "아이디1", "비밀번호1", "비밀번호확인1", "이름1"));
-		Container.memberDao
-				.add(new Member(Container.memberDao.lastId, Util.getDate(), "아이디2", "비밀번호2", "비밀번호확인2", "이름2"));
-		Container.memberDao
-				.add(new Member(Container.memberDao.lastId, Util.getDate(), "아이디3", "비밀번호3", "비밀번호확인3", "이름3"));
+		Container.memberDao.add(new Member(Container.memberDao.lastArticleId(), Util.getDate(), "아이디1", "비밀번호1", "비밀번호확인1", "이름1"));
+		Container.memberDao.add(new Member(Container.memberDao.lastArticleId(), Util.getDate(), "아이디2", "비밀번호2", "비밀번호확인2", "이름2"));
+		Container.memberDao.add(new Member(Container.memberDao.lastArticleId(), Util.getDate(), "아이디3", "비밀번호3", "비밀번호확인3", "이름3"));
+		
+
 	}
 
 }
