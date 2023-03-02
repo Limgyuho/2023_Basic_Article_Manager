@@ -7,6 +7,7 @@ import com.koreaIT.java.BAM.dto.Article;
 import com.koreaIT.java.BAM.dto.Member;
 
 public class ArticleDao extends Dao {
+	
 	private List<Article> articles;
 
 	public ArticleDao() {
@@ -38,6 +39,30 @@ public class ArticleDao extends Dao {
 
 		}
 		return articles;
+	}
+	
+
+	public Article articlebyId(int id) {
+		// 중복 기능 제거
+		// 찾은 문자를 순회 하는 방법
+		for (Article article : articles) {
+
+			if (article.id == id) {
+				return article;
+				// 게시물의 조건
+			}
+		}
+		return null;
+	}
+
+	public void remove(Article foundArticle) {
+		articles.remove(foundArticle);		
+	}
+
+	public void articleModify(Article foundArticle, String title, String body) {
+
+		foundArticle.title = title;
+		foundArticle.body = body;
 	}
 
 }

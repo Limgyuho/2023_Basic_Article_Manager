@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import com.koreaIT.java.BAM.Service.MemberService;
 import com.koreaIT.java.BAM.container.Container;
 import com.koreaIT.java.BAM.dto.Article;
 import com.koreaIT.java.BAM.dto.Member;
@@ -11,11 +12,11 @@ import com.koreaIT.java.BAM.util.Util;
 
 public class MemberController extends Controller {
 
-	private List<Member> members; //
 	private Scanner sc;
+	private MemberService memberService;
 
 	public MemberController(Scanner sc) {
-		this.members = Container.memberDao.members;
+		this.memberService = Container.memberService;
 		this.sc = sc;
 
 	}
@@ -41,37 +42,19 @@ public class MemberController extends Controller {
 		}
 	}
 
-//	
-//	private Article articlebyId(int id) {
-//		// 중복 기능 제거
-//		// 찾은 문자를 순회 하는 방법
-//		for (Article article : articles) {
-//
-//			if (article.id == id) {
-//				return article;
-//				// 게시물의 조건
-//			}
-//		}
-//		return null;
-//	}
-
 	private void doJoin() {
 
-		if (isLogined()) {
-			System.out.println("로그아웃 후 이용해주세요");
-			return;
-		}
-
-		int id = Container.memberDao.lastArticleId();
-
+		int id = memberService.lastArticleId();
 		String regDate = Util.getDate();
 
 		String loginId = null;
+
+		;
 		while (true) {
 			System.out.printf("로그인 아이디 : ");
 			loginId = sc.nextLine();
 
-			if (loginIdDupChk(loginId) == false) {
+			if (memberService.loginIdDupChk(loginId) == false) {
 				System.out.printf("%s은(는) 이미 사용중인 아이디 입니다\n", loginId);
 				continue;
 			}
@@ -100,17 +83,14 @@ public class MemberController extends Controller {
 		String name = sc.nextLine();
 
 		Member member = new Member(id, regDate, loginId, loginPw, loginPwChk, name);
-		Container.memberDao.add(member);
+		memberService.add(member);
 
 		System.out.printf("%s 회원님 환영 합니다\n", loginId);
 
 	}
 
 	private void doLogin() {
-//			if (isLogined()) {
-//				System.out.println("로그인상태 입니다");
-//				return;
-//			}
+
 		Member member = null;
 		String loginPw = null;
 
@@ -119,13 +99,14 @@ public class MemberController extends Controller {
 			System.out.printf("로그인 아이디 : ");
 			String loginId = sc.nextLine();
 
-			if (loginId.length() == 0) {
+			if (loginId.trim().length() == 0) {
 				System.out.println("로그인 아이디를 입력해주세요");
 				continue;
 			}
-			System.out.printf("로그인 비밀번호 : ");
-			loginPw = sc.nextLine();
+
 			while (true) {
+				System.out.printf("로그인 비밀번호 : ");
+				loginPw = sc.nextLine();
 
 				if (loginPw.trim().length() == 0) {
 					System.out.println("로그인 아이디를 입력해주세요");
@@ -135,7 +116,7 @@ public class MemberController extends Controller {
 			}
 
 			// 로그인후 로그아웃 되지 않게 저장할수 있게 하는 공간을 만들어 인자로 저장한
-			member = getMemberByLoginId(loginId);
+			member = memberService.getMemberByLoginId(loginId);
 
 			// 아이디가 없는 경우 일치하는것이 없는 경우
 			if (member == null) {
@@ -157,74 +138,27 @@ public class MemberController extends Controller {
 
 	}
 
+	private void doLogout() {
+		loginedMember = null;
+		System.out.println("로그아웃 되었습니다");
+	}
+
 	private void doprofile() {
 
-		if (isLogined() == true) {
-			System.out.println("==내정보==");
-			System.out.printf("로그인 아이디: %s\n", loginedMember.loginId);
-			System.out.printf("이름 : %s\n", loginedMember.name);
-			System.out.printf("회원 비밀번호 : %s\n", loginedMember.loginPw);
-			System.out.printf("회원 번호 : %d\n", loginedMember.id);
-			System.out.printf("가입날짤 : %s\n", loginedMember.regDate);
-			return;
-		}
-		this.loginedMember = null;
-		System.out.println("로그인후 이용해주세요");
-	}
-///
+		System.out.println("==내정보==");
+		System.out.printf("로그인 아이디: %s\n", loginedMember.loginId);
+		System.out.printf("이름 : %s\n", loginedMember.name);
+		System.out.printf("회원 비밀번호 : %s\n", loginedMember.loginPw);
+		System.out.printf("회원 번호 : %d\n", loginedMember.id);
+		System.out.printf("가입날짤 : %s\n", loginedMember.regDate);
 
-///
-	private void doLogout() {
-		if (isLogined() == false) {
-			System.out.println("로그인 후 이용해주세요");
-			return;
-		}
-		this.loginedMember = null;
-		System.out.println("로그아웃 성공");
 	}
 
-	private Member getMemberByLoginId(String loginId) {
-
-		for (Member member : members) {
-			if (member.loginId.equals(loginId)) {
-
-				return member;
-			}
-
-		}
-		return null;
-	}
-
-	//
-
-	private boolean loginIdDupChk(String loginId) {
-
-		// 효율적으로 하기 위해 아래에서 호출한다
-		Member member = getMemberByLoginId(loginId);
-//
-//		for (Member member : members) {
-//			if (member.loginId.equals(loginId)) {
-//
-//				return false;
-//			}
-//		}
-
-		// 있는지 없지 판단
-		if (member == null) {
-			return true;
-		}
-
-		return false;
-	}
-
-	// int id,String regDate, String loginId, String loginPw,String
-	// loginPwChk,String name
 	public void makeTestData() {
 		System.out.println("회원 데이터를 생성합니다");
-		Container.memberDao.add(new Member(Container.memberDao.lastArticleId(), Util.getDate(), "아이디1", "비밀번호1", "비밀번호확인1", "이름1"));
-		Container.memberDao.add(new Member(Container.memberDao.lastArticleId(), Util.getDate(), "아이디2", "비밀번호2", "비밀번호확인2", "이름2"));
-		Container.memberDao.add(new Member(Container.memberDao.lastArticleId(), Util.getDate(), "아이디3", "비밀번호3", "비밀번호확인3", "이름3"));
-		
+		memberService.add(new Member(memberService.lastArticleId(), Util.getDate(), "아이디1", "비밀번호1", "비밀번호확인1", "이름1"));
+		memberService.add(new Member(memberService.lastArticleId(), Util.getDate(), "아이디2", "비밀번호2", "비밀번호확인2", "이름2"));
+		memberService.add(new Member(memberService.lastArticleId(), Util.getDate(), "아이디3", "비밀번호3", "비밀번호확인3", "이름3"));
 
 	}
 

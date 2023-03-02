@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
+import com.koreaIT.java.BAM.Service.ArticleService;
+import com.koreaIT.java.BAM.Service.MemberService;
 import com.koreaIT.java.BAM.container.Container;
 import com.koreaIT.java.BAM.dao.ArticleDao;
 import com.koreaIT.java.BAM.dto.Article;
@@ -17,10 +19,14 @@ public class ArticleController extends Controller {
 	private Scanner sc;
 	// 전역변수로 만들어준다
 	private String cmd;
-	public int memberid;
+	private ArticleService articleService;
+	private MemberService memberService;
 
+	
 	public ArticleController(Scanner sc) {
 		this.sc = sc;
+		this.articleService = Container.articleService;
+		this.memberService = Container.memberService;
 //		this.articles = Container.articleDao.articles;
 		// 하드코딩을
 
@@ -62,7 +68,7 @@ public class ArticleController extends Controller {
 
 	private void dowrite() {
 
-		int id = Container.articleDao.lastArticleId();
+		int id = Container.articleService.lastArticleId();
 
 		String regDate = Util.getDate();
 
@@ -74,8 +80,8 @@ public class ArticleController extends Controller {
 		//
 		Article article = new Article(id, regDate, loginedMember.id, title, body);
 
-		// articles.add(article);
-		Container.articleDao.add(article);
+		//결롸를 남겨야 하는가 마는가
+		articleService.add(article);
 
 		System.out.printf("%d번 글이 생성되었습니다\n", id);
 
@@ -92,7 +98,7 @@ public class ArticleController extends Controller {
 		// printArticles 라는 리모컨을 만들어 준다
 
 		// getprintArticles최종적으로는 getprintArticles가 실행되어야 한다
-		List<Article> printArticles = Container.articleService.getprintArticles(searchKeyworld);
+		List<Article> printArticles = articleService.getprintArticles(searchKeyworld);
 
 		if (printArticles.size() == 0) {
 
@@ -102,28 +108,13 @@ public class ArticleController extends Controller {
 
 		// printArticles을 순회해준다
 		System.out.printf("번호	|	제목	|	날짜	|	작성자	|	조회\n");
-		// 향상된 for문은 역순회를 해준다
-		//
-//		Collections.reverse(printArticles);
-		for (int i = printArticles.size() -1; i>= 0; i--) {
-
-			//
-			
+		for (int i = printArticles.size() - 1; i >= 0; i--) {
 			Article article = printArticles.get(i);
 			
-			String writeName = null;
-
-			List<Member> members = Container.memberDao.members;
-
-			for (Member member : members) {
-				if (article.memberid == member.id) {
-					writeName = member.name;
-					break;
-				}
-			}
+			String writerName = memberService.getWriterName(article.memberid);
 
 			System.out.printf("%d	|	%s	| 	%s	|	%s	|	%d\n", article.id, article.title, article.regDate,
-					writeName, article.hit);
+					writerName, article.hit);
 
 		}
 	}
@@ -141,7 +132,7 @@ public class ArticleController extends Controller {
 
 		// 중복 기능 제거
 		// 중복 제거 로직이 즉 순회가 id 를 찾아오는 로직이다
-		Article foundArticle = articlebyId(id);
+		Article foundArticle = articleService.articlebyId(id);
 
 		if (foundArticle == null) {
 			// 게시물이 없는 경우
@@ -149,16 +140,10 @@ public class ArticleController extends Controller {
 			return;
 		}
 
-		String writeName = null;
-
-		List<Member> members = Container.memberDao.members;
-
-		for (Member member : members) {
-			if (foundArticle.memberid == member.id) {
-				writeName = member.name;
-				break;
-			}
-		}
+		String writerName = memberService.getWriterName(foundArticle.memberid);
+		
+		
+		
 		// 조회수 기능은 함수를 이용 하는것을 추천한다
 		// 게시글들 마다 구별짓기 위함이다
 		// article write을 하였을때 article 객체로 조립되는 순간 개시글이 조회 되는 순간 0이 된다
@@ -169,11 +154,12 @@ public class ArticleController extends Controller {
 		System.out.printf("날짜 : %s\n", foundArticle.regDate);
 		System.out.printf("제목 : %s\n", foundArticle.title);
 		System.out.printf("내용 : %s\n", foundArticle.body);
-		System.out.printf("작성자 : %d\n", writeName);
+		System.out.printf("작성자 : %s\n", writerName);
 		// 조회수 기능을 보여주는 기능을 먼저 보여준다
 		System.out.printf("조회수 : %d\n", foundArticle.hit);
 
 	}
+
 
 	private void doModify() {
 		// 특정 문자 찾기
@@ -189,7 +175,7 @@ public class ArticleController extends Controller {
 		// modify는 순회를 인덱스로 하기 때문에 인덱스로 만든다
 
 		// foundArticle안에 게시물의 정보가 담겨져있다
-		Article foundArticle = articlebyId(id);
+		Article foundArticle = Container.articleService.articlebyId(id);
 
 		// 게시물이 없는 경우-
 		if (foundArticle == null) {
@@ -209,9 +195,9 @@ public class ArticleController extends Controller {
 		String body = sc.nextLine();
 
 		// 변경된 값을 리모컨의 내부에 넣어준다
-		foundArticle.title = title;
-		foundArticle.body = body;
 
+		articleService.ArticleModify(foundArticle, title, body);
+		
 		System.out.printf("%d번 게시글을 수정하였습니다\n", id);
 	}
 
@@ -230,7 +216,7 @@ public class ArticleController extends Controller {
 
 		// 명령어 맨뒤에 오는 것을 기준으로 한다
 		// 0에서 거꾸로 가야 하기 때문에 -1을 해준다
-		Article foundArticle = articlebyId(id);
+		Article foundArticle = articleService.articlebyId(id);
 
 		// 게시물이 없는 경우-
 		if (foundArticle == null) {
@@ -244,33 +230,22 @@ public class ArticleController extends Controller {
 			return;
 		}
 
+		
+		articleService.remove(foundArticle);
+		
 		// articles리스트의 remove 기능을 사용하여 제거한다
 		// 값에서 인덱스를 찾기
-		articles.remove(foundArticle);
+		
 		System.out.printf("%d 게시글이 삭제 되었습니다\n", id);
 	}
 
-	private Article articlebyId(int id) {
-		// 중복 기능 제거
-		// 찾은 문자를 순회 하는 방법
-		for (Article article : articles) {
 
-			if (article.id == id) {
-				return article;
-				// 게시물의 조건
-			}
-		}
-		return null;
-	}
 
 	public void makeTestData() {
 		System.out.println("게시물 데트스 데이터를 생성합니다");
-		Container.articleDao
-				.add(new Article(Container.articleDao.lastArticleId(), Util.getDate(), 1, "제목1", "테스트", 10));
-		Container.articleDao
-				.add(new Article(Container.articleDao.lastArticleId(), Util.getDate(), 2, "제목2", "테스트", 20));
-		Container.articleDao
-				.add(new Article(Container.articleDao.lastArticleId(), Util.getDate(), 3, "제목3", "테스트", 30));
+		articleService.add(new Article(articleService.lastArticleId(), Util.getDate(), 1, "제목1", "테스트", 10));
+		articleService.add(new Article(articleService.lastArticleId(), Util.getDate(), 2, "제목2", "테스트", 20));
+		articleService.add(new Article(articleService.lastArticleId(), Util.getDate(), 3, "제목3", "테스트", 30));
 
 	}
 }
